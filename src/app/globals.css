@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-white: #ffffff;
+  --color-surface: #f8fffe;
+  --color-green-primary: #4caf82;
+  --color-green-dark: #2e7d5e;
+  --color-green-light: #e8f5ef;
+  --color-teal-primary: #38b2ac;
+  --color-teal-light: #e6fffa;
+  --color-pink-primary: #f9a8c9;
+  --color-pink-light: #fff0f6;
+  --color-text-primary: #1a2e25;
+  --color-text-secondary: #6b8f7a;
+  --color-border: #e2ede8;
+}
+
+body {
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
