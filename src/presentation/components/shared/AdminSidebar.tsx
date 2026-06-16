@@ -24,7 +24,7 @@ export function AdminSidebar() {
 
   return (
     <aside
-      className="w-56 min-h-screen border-r flex-shrink-0"
+      className="w-56 hidden md:flex flex-col border-r flex-shrink-0"
       style={{ borderColor: '#E2EDE8', background: '#fff' }}
     >
       <Menu

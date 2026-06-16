@@ -22,7 +22,7 @@ export function AppHeader() {
 
   return (
     <header
-      className="flex items-center justify-between px-6 h-16 border-b"
+      className="flex items-center justify-between px-4 md:px-6 h-16 border-b"
       style={{ borderColor: '#E2EDE8', background: '#fff' }}
     >
       <span className="text-lg font-semibold" style={{ color: '#1A2E25' }}>
