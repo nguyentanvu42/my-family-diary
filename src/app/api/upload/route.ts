@@ -17,6 +17,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
 
-  const url = await blobService.upload(file);
-  return NextResponse.json({ url }, { status: 201 });
+  try {
+    const url = await blobService.upload(file);
+    return NextResponse.json({ url }, { status: 201 });
+  } catch (err) {
+    console.error('[upload] error:', err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
 }
