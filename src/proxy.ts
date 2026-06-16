@@ -12,9 +12,10 @@ export default withAuth({
       if (
         pathname.startsWith('/api/finance') ||
         pathname.startsWith('/api/house') ||
-        pathname.startsWith('/api/reminders') ||
-        pathname.startsWith('/api/upload')
+        pathname.startsWith('/api/reminders')
       ) return isAdmin;
+
+      if (pathname.startsWith('/api/upload')) return isLoggedIn;
 
       // Guest routes — require login (any role)
       if (pathname.startsWith('/moments')) return isLoggedIn;

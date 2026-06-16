@@ -26,7 +26,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
+  const userRole = (session?.user as { role?: string })?.role;
+  if (!session?.user || !userRole) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
     ...body,
     userId: (session.user as { id: string }).id,
     takenAt: new Date(body.takenAt),
+    isPublic: userRole === 'ADMIN' ? (body.isPublic ?? true) : true,
   });
   return NextResponse.json(moment, { status: 201 });
 }

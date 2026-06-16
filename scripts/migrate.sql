@@ -2,7 +2,7 @@
 -- Run this in Supabase Dashboard → SQL Editor
 
 -- Enums
-CREATE TYPE "Role" AS ENUM ('GUEST', 'ADMIN');
+CREATE TYPE "Role" AS ENUM ('MEMBER', 'ADMIN');
 CREATE TYPE "FinanceType" AS ENUM ('INCOME', 'EXPENSE');
 CREATE TYPE "TaskStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'DONE');
 CREATE TYPE "RepeatType" AS ENUM ('NONE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
@@ -12,7 +12,7 @@ CREATE TABLE "User" (
   "id"        TEXT NOT NULL PRIMARY KEY,
   "name"      TEXT NOT NULL,
   "email"     TEXT NOT NULL UNIQUE,
-  "role"      "Role" NOT NULL DEFAULT 'GUEST',
+  "role"      "Role" NOT NULL DEFAULT 'MEMBER',
   "avatar"    TEXT,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

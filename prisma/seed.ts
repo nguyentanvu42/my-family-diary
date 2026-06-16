@@ -25,7 +25,7 @@ async function main() {
       id: 'user-guest-001',
       name: 'Thu Hương',
       email: 'guest@family.local',
-      role: Role.GUEST,
+      role: Role.MEMBER,
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest',
     },
   });
