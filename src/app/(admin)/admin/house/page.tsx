@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Form, Input, DatePicker, Modal, Typography, message, Spin } from 'antd';
+import { App, Button, Form, Input, DatePicker, Modal, Typography, Spin } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { HouseTaskBoard } from '@/presentation/components/admin/HouseTaskBoard';
 import type { House, TaskStatus } from '@/core/entities/House';
@@ -14,6 +14,7 @@ export default function HousePage() {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const { message } = App.useApp();
 
   const load = async () => {
     setLoading(true);
