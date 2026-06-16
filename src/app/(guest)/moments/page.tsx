@@ -1,11 +1,7 @@
 import { PrismaMomentRepository } from '@/infrastructure/repositories/PrismaMomentRepository';
 import { GetPublicMomentsUseCase } from '@/core/use-cases/moments/GetPublicMomentsUseCase';
 import { MomentGrid } from '@/presentation/components/guest/MomentGrid';
-import { Typography } from 'antd';
-
 export const dynamic = 'force-dynamic';
-
-const { Title, Text } = Typography;
 
 export default async function MomentsPage() {
   const repo = new PrismaMomentRepository();
@@ -15,10 +11,10 @@ export default async function MomentsPage() {
   return (
     <div>
       <div className="mb-8">
-        <Title level={2} style={{ color: '#1A2E25', marginBottom: 4 }}>
+        <h2 style={{ color: '#1A2E25', marginBottom: 4, fontSize: 24, fontWeight: 600, margin: '0 0 4px' }}>
           Khoảnh khắc gia đình
-        </Title>
-        <Text style={{ color: '#6B8F7A' }}>Những kỷ niệm đẹp cùng gia đình</Text>
+        </h2>
+        <p style={{ color: '#6B8F7A', margin: 0 }}>Những kỷ niệm đẹp cùng gia đình</p>
       </div>
       <MomentGrid moments={moments} />
     </div>

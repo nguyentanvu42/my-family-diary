@@ -33,9 +33,9 @@ export const familyTheme: ThemeConfig = {
       boxShadow: '0 2px 12px rgba(76, 175, 130, 0.08)',
     },
     Menu: {
-      colorItemBgSelected: '#E8F5EF',
-      colorItemTextSelected: '#2E7D5E',
-      colorItemBgHover: '#F8FFFE',
+      itemSelectedBg: '#E8F5EF',
+      itemSelectedColor: '#2E7D5E',
+      itemHoverBg: '#F8FFFE',
     },
     Layout: {
       siderBg: '#FFFFFF',

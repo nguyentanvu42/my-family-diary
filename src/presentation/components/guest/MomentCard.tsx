@@ -18,7 +18,7 @@ export function MomentCard({ moment }: Props) {
       cover={
         firstImage ? (
           <div className="relative h-52 overflow-hidden rounded-t-card">
-            <Image src={firstImage} alt={moment.title} fill className="object-cover" />
+            <Image src={firstImage} alt={moment.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover" />
           </div>
         ) : (
           <div
