@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Family Hub',
-  description: 'Ứng dụng quản lý gia đình',
+  description: 'Nhật ký gia đình',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

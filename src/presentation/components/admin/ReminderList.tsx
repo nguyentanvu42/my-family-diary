@@ -2,8 +2,6 @@
 
 import { List, Tag, Typography, Empty } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
-import type { Reminder } from '@/core/entities/Reminder';
-
 const { Text } = Typography;
 
 const repeatLabel: Record<string, string> = {
@@ -14,8 +12,18 @@ const repeatLabel: Record<string, string> = {
   YEARLY: 'Hàng năm',
 };
 
+interface SerializableReminder {
+  id: string;
+  title: string;
+  description?: string | null;
+  remindAt: string | Date;
+  repeat: string;
+  userId: string;
+  createdAt: string | Date;
+}
+
 interface Props {
-  reminders: Reminder[];
+  reminders: SerializableReminder[];
 }
 
 export function ReminderList({ reminders }: Props) {

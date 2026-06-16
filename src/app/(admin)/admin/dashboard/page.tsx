@@ -20,5 +20,11 @@ export default async function DashboardPage() {
     new GetFinanceSummaryUseCase(new PrismaFinanceRepository()).execute(),
   ]);
 
-  return <DashboardClient finance={finance} reminders={reminders} />;
+  const remindersSerializable = reminders.map((r) => ({
+    ...r,
+    remindAt: r.remindAt.toISOString(),
+    createdAt: r.createdAt.toISOString(),
+  }));
+
+  return <DashboardClient finance={{ summary: finance.summary }} reminders={remindersSerializable} />;
 }

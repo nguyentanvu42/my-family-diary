@@ -20,7 +20,7 @@ export default function LoginPage() {
     if (result?.error) {
       message.error('Email hoặc mật khẩu không đúng.');
     } else {
-      router.push('/admin/dashboard');
+      router.push('/moments');
     }
   };
 
@@ -43,7 +43,7 @@ export default function LoginPage() {
           <Title level={2} style={{ color: '#1A2E25', marginBottom: 4 }}>
             Family Hub
           </Title>
-          <Text style={{ color: '#6B8F7A' }}>Ứng dụng quản lý gia đình</Text>
+          <Text style={{ color: '#6B8F7A' }}>Nhật ký gia đình</Text>
         </div>
 
         {sent ? (

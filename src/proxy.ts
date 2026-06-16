@@ -5,18 +5,20 @@ export default withAuth({
     authorized({ token, req }) {
       const { pathname } = req.nextUrl;
       const isAdmin = token?.role === 'ADMIN';
+      const isLoggedIn = !!token;
 
-      if (pathname.startsWith('/admin') || pathname.includes('/(admin)')) {
-        return isAdmin;
-      }
+      // Admin-only routes
+      if (pathname.startsWith('/admin')) return isAdmin;
       if (
         pathname.startsWith('/api/finance') ||
         pathname.startsWith('/api/house') ||
         pathname.startsWith('/api/reminders') ||
         pathname.startsWith('/api/upload')
-      ) {
-        return isAdmin;
-      }
+      ) return isAdmin;
+
+      // Guest routes — require login (any role)
+      if (pathname.startsWith('/moments')) return isLoggedIn;
+
       return true;
     },
   },
@@ -25,6 +27,8 @@ export default withAuth({
 export const config = {
   matcher: [
     '/admin/:path*',
+    '/moments/:path*',
+    '/moments',
     '/api/finance/:path*',
     '/api/house/:path*',
     '/api/reminders/:path*',

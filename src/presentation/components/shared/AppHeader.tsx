@@ -1,12 +1,15 @@
 'use client';
 
-import { Avatar, Button, Dropdown } from 'antd';
-import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Avatar, Dropdown, Tooltip } from 'antd';
+import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import type { MenuProps } from 'antd';
 
 export function AppHeader() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const isAdmin = (session?.user as { role?: string })?.role === 'ADMIN';
 
   const items: MenuProps['items'] = [
     {
@@ -26,18 +29,33 @@ export function AppHeader() {
         🏡 Family Hub
       </span>
       {session?.user && (
-        <Dropdown menu={{ items }} placement="bottomRight">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <Avatar
-              src={session.user.image}
-              icon={<UserOutlined />}
-              style={{ border: '2px solid #F9A8C9' }}
-            />
-            <span className="hidden sm:block text-sm" style={{ color: '#1A2E25' }}>
-              {session.user.name ?? session.user.email}
-            </span>
-          </div>
-        </Dropdown>
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Tooltip title="Trang quản trị">
+              <button
+                onClick={() => router.push('/admin/dashboard')}
+                className="flex items-center justify-center w-8 h-8 rounded-full transition-colors cursor-pointer"
+                style={{ background: '#E8F5EF', border: 'none' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#C8E6D7')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#E8F5EF')}
+              >
+                <SettingOutlined style={{ color: '#2E7D5E', fontSize: 16 }} />
+              </button>
+            </Tooltip>
+          )}
+          <Dropdown menu={{ items }} placement="bottomRight">
+            <div className="flex items-center gap-2 cursor-pointer">
+              <Avatar
+                src={session.user.image}
+                icon={<UserOutlined />}
+                style={{ border: '2px solid #F9A8C9' }}
+              />
+              <span className="hidden sm:block text-sm" style={{ color: '#1A2E25' }}>
+                {session.user.name ?? session.user.email}
+              </span>
+            </div>
+          </Dropdown>
+        </div>
       )}
     </header>
   );

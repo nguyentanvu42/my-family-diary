@@ -2,8 +2,6 @@
 
 import { Card, Col, Row, Typography } from 'antd';
 import { ReminderList } from './ReminderList';
-import type { Reminder } from '@/core/entities/Reminder';
-
 const { Title, Text } = Typography;
 
 interface FinanceSummary {
@@ -12,9 +10,19 @@ interface FinanceSummary {
   balance: number;
 }
 
+interface SerializableReminder {
+  id: string;
+  title: string;
+  description?: string | null;
+  remindAt: string;
+  repeat: string;
+  userId: string;
+  createdAt: string;
+}
+
 interface Props {
   finance: { summary: FinanceSummary };
-  reminders: Reminder[];
+  reminders: SerializableReminder[];
 }
 
 export function DashboardClient({ finance, reminders }: Props) {
