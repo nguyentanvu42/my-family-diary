@@ -7,6 +7,7 @@ import {
   HomeOutlined,
   BellOutlined,
   DashboardOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -16,6 +17,7 @@ const items = [
   { key: '/admin/finance', icon: <DollarOutlined />, label: 'Tài chính' },
   { key: '/admin/house', icon: <HomeOutlined />, label: 'Nhà cửa' },
   { key: '/admin/reminders', icon: <BellOutlined />, label: 'Nhắc nhở' },
+  { key: '/admin/members', icon: <TeamOutlined />, label: 'Thành viên' },
 ];
 
 export function AdminSidebar() {

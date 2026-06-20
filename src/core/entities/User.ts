@@ -1,4 +1,4 @@
-export type Role = 'MEMBER' | 'ADMIN';
+export type Role = 'MEMBER' | 'CHU_HO' | 'ADMIN';
 
 export interface User {
   id: string;
@@ -6,5 +6,8 @@ export interface User {
   email: string;
   role: Role;
   avatar?: string | null;
+  familyName?: string | null;
+  relationship?: string | null;
+  householdId?: string | null;
   createdAt: Date;
 }

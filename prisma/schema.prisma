@@ -9,23 +9,31 @@ generator client {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  name      String
-  email     String     @unique
-  role      Role       @default(MEMBER)
-  avatar    String?
-  createdAt DateTime   @default(now())
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  role         Role       @default(MEMBER)
+  avatar       String?
+  password     String?
+  familyName   String?
+  relationship String?
+  householdId  String?
+  household    User?      @relation("Household", fields: [householdId], references: [id])
+  members      User[]     @relation("Household")
+  createdAt    DateTime   @default(now())
 
   moments   Moment[]
   finances  Finance[]
   reminders Reminder[]
+  houses    House[]
   accounts  Account[]
   sessions  Session[]
 }
 
 enum Role {
-  MEMBER
   ADMIN
+  CHU_HO
+  MEMBER
 }
 
 model Moment {
@@ -62,6 +70,8 @@ model House {
   id        String      @id @default(cuid())
   name      String
   documents Json?
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
   tasks     HouseTask[]
 }
 

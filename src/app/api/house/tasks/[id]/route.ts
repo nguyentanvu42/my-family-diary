@@ -7,7 +7,7 @@ const repo = new PrismaHouseRepository();
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
+  if (!session?.user || session.user.role !== 'CHU_HO') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -19,7 +19,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
+  if (!session?.user || session.user.role !== 'CHU_HO') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

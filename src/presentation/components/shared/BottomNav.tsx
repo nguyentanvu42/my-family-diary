@@ -6,6 +6,7 @@ import {
   DollarOutlined,
   HomeOutlined,
   BellOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -15,6 +16,7 @@ const navItems = [
   { key: '/admin/finance',   icon: <DollarOutlined />,   label: 'Tài chính' },
   { key: '/admin/house',     icon: <HomeOutlined />,     label: 'Nhà cửa' },
   { key: '/admin/reminders', icon: <BellOutlined />,     label: 'Nhắc nhở' },
+  { key: '/admin/members',   icon: <TeamOutlined />,     label: 'Thành viên' },
 ];
 
 export function BottomNav() {

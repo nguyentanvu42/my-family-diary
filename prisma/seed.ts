@@ -1,36 +1,72 @@
 import { PrismaClient, Role, FinanceType, TaskStatus, RepeatType } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // ── Users ────────────────────────────────────────────────────
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@family.local' },
+  // ── Super Admin (quản trị hệ thống) ─────────────────────────
+  const superAdmin = await prisma.user.upsert({
+    where: { email: 'superadmin@family.local' },
     update: {},
+    create: {
+      id: 'user-superadmin-001',
+      name: 'Super Admin',
+      email: 'superadmin@family.local',
+      role: Role.ADMIN,
+      // Login bằng ADMIN_PASSWORD env var, không cần password hash
+    },
+  });
+
+  const chuHoPassword = bcrypt.hashSync('password123', 10);
+  const memberPassword = bcrypt.hashSync('password123', 10);
+
+  // ── Chủ hộ (upsert by id để kế thừa FK của Moment/Finance/Reminder) ──
+  const chuHo = await prisma.user.upsert({
+    where: { id: 'user-admin-001' },
+    update: {
+      email: 'chuho@family.local',
+      role: Role.CHU_HO,
+      familyName: 'Gia đình Nguyễn',
+      password: chuHoPassword,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chuho',
+    },
     create: {
       id: 'user-admin-001',
       name: 'Nguyễn Tấn Vũ',
-      email: 'admin@family.local',
-      role: Role.ADMIN,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+      email: 'chuho@family.local',
+      role: Role.CHU_HO,
+      familyName: 'Gia đình Nguyễn',
+      password: chuHoPassword,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chuho',
     },
   });
 
-  const guest = await prisma.user.upsert({
-    where: { email: 'guest@family.local' },
-    update: {},
+  // ── Thành viên gia đình (do chủ hộ tạo) ─────────────────────
+  const member = await prisma.user.upsert({
+    where: { id: 'user-guest-001' },
+    update: {
+      email: 'member@family.local',
+      role: Role.MEMBER,
+      relationship: 'Vợ',
+      householdId: chuHo.id,
+      password: memberPassword,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=member',
+    },
     create: {
       id: 'user-guest-001',
       name: 'Thu Hương',
-      email: 'guest@family.local',
+      email: 'member@family.local',
       role: Role.MEMBER,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest',
+      relationship: 'Vợ',
+      householdId: chuHo.id,
+      password: memberPassword,
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=member',
     },
   });
 
-  console.log('✅ Users:', admin.name, '|', guest.name);
+  console.log('✅ Users:', superAdmin.name, '|', chuHo.name, '|', member.name);
 
   // ── Moments ──────────────────────────────────────────────────
   const moments = await Promise.all([
@@ -47,7 +83,7 @@ async function main() {
         takenAt: new Date('2025-01-29'),
         isPublic: true,
         tags: ['tết', 'gia đình', '2025'],
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.moment.upsert({
@@ -63,7 +99,7 @@ async function main() {
         takenAt: new Date('2025-03-15'),
         isPublic: true,
         tags: ['sinh nhật', 'bé Na', 'gia đình'],
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.moment.upsert({
@@ -80,7 +116,7 @@ async function main() {
         takenAt: new Date('2025-05-01'),
         isPublic: true,
         tags: ['du lịch', 'Đà Lạt', '2025'],
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.moment.upsert({
@@ -94,7 +130,7 @@ async function main() {
         takenAt: new Date('2025-06-10'),
         isPublic: false,
         tags: ['gia đình', 'giỗ'],
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.moment.upsert({
@@ -110,7 +146,7 @@ async function main() {
         takenAt: new Date('2025-08-20'),
         isPublic: true,
         tags: ['kinh doanh', 'gia đình'],
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
   ]);
@@ -119,7 +155,6 @@ async function main() {
 
   // ── Finance ──────────────────────────────────────────────────
   const finances = await Promise.all([
-    // Thu nhập
     prisma.finance.upsert({
       where: { id: 'finance-001' },
       update: {},
@@ -130,7 +165,7 @@ async function main() {
         category: 'Lương',
         description: 'Lương tháng 6/2025',
         date: new Date('2025-06-05'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.finance.upsert({
@@ -143,7 +178,7 @@ async function main() {
         category: 'Freelance',
         description: 'Thiết kế web cho khách hàng',
         date: new Date('2025-06-12'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.finance.upsert({
@@ -156,10 +191,9 @@ async function main() {
         category: 'Lương',
         description: 'Lương tháng 7/2025',
         date: new Date('2025-07-05'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
-    // Chi tiêu
     prisma.finance.upsert({
       where: { id: 'finance-004' },
       update: {},
@@ -170,7 +204,7 @@ async function main() {
         category: 'Ăn uống',
         description: 'Chi phí ăn uống tháng 6',
         date: new Date('2025-06-30'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.finance.upsert({
@@ -183,7 +217,7 @@ async function main() {
         category: 'Điện nước',
         description: 'Tiền điện + nước tháng 6',
         date: new Date('2025-06-15'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.finance.upsert({
@@ -196,7 +230,7 @@ async function main() {
         category: 'Internet',
         description: 'Cước internet + điện thoại',
         date: new Date('2025-06-10'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.finance.upsert({
@@ -209,7 +243,7 @@ async function main() {
         category: 'Học phí',
         description: 'Học phí tiếng Anh cho bé',
         date: new Date('2025-07-01'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.finance.upsert({
@@ -222,17 +256,17 @@ async function main() {
         category: 'Mua sắm',
         description: 'Quần áo mùa hè cho bé',
         date: new Date('2025-07-10'),
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
   ]);
 
   console.log('✅ Finance:', finances.length);
 
-  // ── House ────────────────────────────────────────────────────
+  // ── House (thuộc chủ hộ) ─────────────────────────────────────
   const house = await prisma.house.upsert({
     where: { id: 'house-001' },
-    update: {},
+    update: { userId: chuHo.id },
     create: {
       id: 'house-001',
       name: 'Nhà phố Phước Long',
@@ -240,13 +274,14 @@ async function main() {
         'https://example.com/docs/so-do.pdf',
         'https://example.com/docs/hop-dong.pdf',
       ],
+      userId: chuHo.id,
     },
   });
 
   console.log('✅ House:', house.name);
 
   // ── HouseTasks ───────────────────────────────────────────────
-  const tasks = await Promise.all([
+  const houseTasks = await Promise.all([
     prisma.houseTask.upsert({
       where: { id: 'task-001' },
       update: {},
@@ -304,7 +339,7 @@ async function main() {
     }),
   ]);
 
-  console.log('✅ HouseTasks:', tasks.length);
+  console.log('✅ HouseTasks:', houseTasks.length);
 
   // ── Reminders ────────────────────────────────────────────────
   const reminders = await Promise.all([
@@ -317,7 +352,7 @@ async function main() {
         description: 'Nhớ mua quà và đặt bàn nhà hàng trước 1 ngày',
         remindAt: new Date('2025-09-12T08:00:00'),
         repeat: RepeatType.YEARLY,
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.reminder.upsert({
@@ -329,7 +364,7 @@ async function main() {
         description: 'Đóng học phí tiếng Anh cho bé Na — hạn ngày 5 hàng tháng',
         remindAt: new Date('2025-07-05T09:00:00'),
         repeat: RepeatType.MONTHLY,
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.reminder.upsert({
@@ -341,7 +376,7 @@ async function main() {
         description: 'Lịch khám tổng quát hàng năm tại Bệnh viện FV',
         remindAt: new Date('2025-12-01T07:30:00'),
         repeat: RepeatType.YEARLY,
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.reminder.upsert({
@@ -353,7 +388,7 @@ async function main() {
         description: 'Cuối học kỳ 1',
         remindAt: new Date('2025-11-20T17:00:00'),
         repeat: RepeatType.NONE,
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
     prisma.reminder.upsert({
@@ -365,7 +400,7 @@ async function main() {
         description: 'Gia hạn bảo hiểm xe máy trước khi hết hạn',
         remindAt: new Date('2025-08-15T08:00:00'),
         repeat: RepeatType.YEARLY,
-        userId: admin.id,
+        userId: chuHo.id,
       },
     }),
   ]);
@@ -373,8 +408,9 @@ async function main() {
   console.log('✅ Reminders:', reminders.length);
 
   console.log('\n🎉 Seed completed!');
-  console.log(`   Admin login: admin@family.local`);
-  console.log(`   Guest login: guest@family.local`);
+  console.log('   Super Admin : superadmin@family.local  (dùng ADMIN_PASSWORD env)');
+  console.log('   Chủ hộ     : chuho@family.local        (password: password123)');
+  console.log('   Thành viên : member@family.local       (password: password123)');
 }
 
 main()

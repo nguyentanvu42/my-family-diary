@@ -3,8 +3,8 @@ import type { IHouseRepository } from '@/core/interfaces/IHouseRepository';
 import type { House, HouseTask, CreateHouseTaskDto, UpdateHouseTaskDto } from '@/core/entities/House';
 
 export class PrismaHouseRepository implements IHouseRepository {
-  async findFirst(): Promise<House | null> {
-    const row = await prisma.house.findFirst({ include: { tasks: true } });
+  async findByUserId(userId: string): Promise<House | null> {
+    const row = await prisma.house.findFirst({ where: { userId }, include: { tasks: true } });
     if (!row) return null;
     return {
       ...row,

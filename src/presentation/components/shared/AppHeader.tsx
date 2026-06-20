@@ -9,7 +9,12 @@ import type { MenuProps } from 'antd';
 export function AppHeader() {
   const { data: session } = useSession();
   const router = useRouter();
-  const isAdmin = (session?.user as { role?: string })?.role === 'ADMIN';
+  const role = session?.user?.role;
+  const isChuHo = role === 'CHU_HO';
+  const isSuperAdmin = role === 'ADMIN';
+
+  const adminTarget = isSuperAdmin ? '/super-admin/dashboard' : '/admin/dashboard';
+  const showAdminGear = isChuHo || isSuperAdmin;
 
   const items: MenuProps['items'] = [
     {
@@ -19,6 +24,10 @@ export function AppHeader() {
       onClick: () => signOut({ callbackUrl: '/login' }),
     },
   ];
+
+  const displayName = isChuHo && session?.user?.familyName
+    ? session.user.familyName
+    : (session?.user?.name ?? session?.user?.email);
 
   return (
     <header
@@ -30,10 +39,10 @@ export function AppHeader() {
       </span>
       {session?.user && (
         <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Tooltip title="Trang quản trị">
+          {showAdminGear && (
+            <Tooltip title={isSuperAdmin ? 'Quản trị hệ thống' : 'Trang quản trị'}>
               <button
-                onClick={() => router.push('/admin/dashboard')}
+                onClick={() => router.push(adminTarget)}
                 className="flex items-center justify-center w-8 h-8 rounded-full transition-colors cursor-pointer"
                 style={{ background: '#E8F5EF', border: 'none' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#C8E6D7')}
@@ -51,7 +60,7 @@ export function AppHeader() {
                 style={{ border: '2px solid #F9A8C9' }}
               />
               <span className="hidden sm:block text-sm" style={{ color: '#1A2E25' }}>
-                {session.user.name ?? session.user.email}
+                {displayName}
               </span>
             </div>
           </Dropdown>

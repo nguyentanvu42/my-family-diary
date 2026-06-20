@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
+import { requireHousehold } from '@/lib/household';
 import { PrismaReminderRepository } from '@/infrastructure/repositories/PrismaReminderRepository';
 import { PrismaFinanceRepository } from '@/infrastructure/repositories/PrismaFinanceRepository';
 import { GetUpcomingRemindersUseCase } from '@/core/use-cases/reminders/GetUpcomingRemindersUseCase';
@@ -9,15 +10,15 @@ import { DashboardClient } from '@/presentation/components/admin/DashboardClient
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
-  if (!session || (session.user as { role?: string }).role !== 'ADMIN') {
+  if (!session || session.user.role !== 'CHU_HO') {
     redirect('/login');
   }
 
+  const householdId = requireHousehold(session);
+
   const [reminders, finance] = await Promise.all([
-    new GetUpcomingRemindersUseCase(new PrismaReminderRepository()).execute(
-      (session.user as { id: string }).id
-    ),
-    new GetFinanceSummaryUseCase(new PrismaFinanceRepository()).execute(),
+    new GetUpcomingRemindersUseCase(new PrismaReminderRepository()).execute(householdId),
+    new GetFinanceSummaryUseCase(new PrismaFinanceRepository()).execute(householdId),
   ]);
 
   const remindersSerializable = reminders.map((r) => ({

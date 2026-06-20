@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { requireHousehold } from '@/lib/household';
-import { PrismaMomentRepository } from '@/infrastructure/repositories/PrismaMomentRepository';
-
-const repo = new PrismaMomentRepository();
+import { prisma } from '@/lib/prisma';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
@@ -12,20 +9,31 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const householdId = requireHousehold(session);
   const { id } = await params;
-
-  const existing = await repo.findById(id);
-  if (!existing || existing.userId !== householdId) {
+  const member = await prisma.user.findUnique({ where: { id } });
+  if (!member || member.householdId !== session.user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  const body = await req.json();
-  const moment = await repo.update(id, {
-    ...body,
-    ...(body.takenAt && { takenAt: new Date(body.takenAt) }),
+  const { name, relationship, avatar } = await req.json();
+  const updated = await prisma.user.update({
+    where: { id },
+    data: {
+      ...(name && { name }),
+      ...(relationship !== undefined && { relationship }),
+      ...(avatar !== undefined && { avatar }),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatar: true,
+      relationship: true,
+      createdAt: true,
+    },
   });
-  return NextResponse.json(moment);
+
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -34,14 +42,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const householdId = requireHousehold(session);
   const { id } = await params;
-
-  const existing = await repo.findById(id);
-  if (!existing || existing.userId !== householdId) {
+  const member = await prisma.user.findUnique({ where: { id } });
+  if (!member || member.householdId !== session.user.id) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  await repo.delete(id);
+  await prisma.user.delete({ where: { id } });
   return new NextResponse(null, { status: 204 });
 }

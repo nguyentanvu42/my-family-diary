@@ -4,22 +4,17 @@ export default withAuth({
   callbacks: {
     authorized({ token, req }) {
       const { pathname } = req.nextUrl;
-      const isAdmin = token?.role === 'ADMIN';
+      const role = token?.role as string | undefined;
       const isLoggedIn = !!token;
+      const isChuHo = role === 'CHU_HO';
+      const isAdmin = role === 'ADMIN';
 
-      // Admin-only routes
-      if (pathname.startsWith('/admin')) return isAdmin;
-      if (
-        pathname.startsWith('/api/finance') ||
-        pathname.startsWith('/api/house') ||
-        pathname.startsWith('/api/reminders')
-      ) return isAdmin;
-
+      if (pathname.startsWith('/super-admin')) return isAdmin;
+      if (pathname.startsWith('/admin')) return isChuHo;
+      if (pathname.startsWith('/api/members')) return isChuHo;
+      if (/^\/api\/(finance|house|reminders)/.test(pathname)) return isChuHo;
       if (pathname.startsWith('/api/upload')) return isLoggedIn;
-
-      // Guest routes — require login (any role)
       if (pathname.startsWith('/moments')) return isLoggedIn;
-
       return true;
     },
   },
@@ -27,9 +22,11 @@ export default withAuth({
 
 export const config = {
   matcher: [
+    '/super-admin/:path*',
     '/admin/:path*',
     '/moments/:path*',
     '/moments',
+    '/api/members/:path*',
     '/api/finance/:path*',
     '/api/house/:path*',
     '/api/reminders/:path*',
